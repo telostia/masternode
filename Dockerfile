@@ -39,17 +39,19 @@ RUN apt-get install -y \
 #  ./autogen.sh && \
 #  ./configure --without-gui && make
 
-ENV VERSION=0.4.2
+ENV VERSION=0.3.2
 
-RUN mkdir /ravendark
+#RUN mkdir /ravendark
 
-RUN wget -qO- https://github.com/raven-dark/raven-dark/releases/download/${VERSION}/ravendarkd-v${VERSION}-ubuntu-trusty.tar.gz | tar xvz -C /ravendark
+RUN wget https://github.com/raven-dark/raven-dark/archive/0.3.2.tar.gz && tar -xf 0.3.2.tar.gz  && cd raven-dark-0.3.2 && chmod +x autogen.sh && chmod +x share/genbuild.sh && chmod +x ./src/leveldb/build_detect_platform && ./autogen.sh && ./configure --with-pic --without-gui --without-miniupnpc --disable-tests --disable-bench --disable-zmq --disable-maintainer-mode  --disable-miner && make
 
-RUN chmod +x /ravendark/ravendarkd
-RUN chmod +x /ravendark/ravendark-cli
+#RUN wget -qO- https://github.com/raven-dark/raven-dark/releases/download/${VERSION}/ravendarkd-v${VERSION}-ubuntu-trusty.tar.gz | tar xvz -C /ravendark
 
-RUN ln -sf /ravendark/ravendarkd /usr/bin/ravendarkd
-RUN ln -sf /ravendark/ravendark-cli /usr/bin/ravendark-cli
+RUN chmod +x /raven-dark-0.3.2/src/ravendarkd
+RUN chmod +x /raven-dark-0.3.2/src/ravendark-cli
+
+RUN ln -sf /raven-dark-0.3.2/src/ravendarkd /usr/bin/ravendarkd
+RUN ln -sf /raven-dark-0.3.2/src/ravendark-cli /usr/bin/ravendark-cli
 
 RUN apt-get autoclean && \
   apt-get autoremove -y
@@ -63,18 +65,23 @@ VOLUME /root/data
 
 # sentinel
 ENV ENVIR=docker
-RUN add-apt-repository ppa:jonathonf/python-3.6
+RUN apt-get -y install software-properties-common
+#RUN add-apt-repository -y ppa:jblgf0/python
+#RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt-get update
 RUN apt-get install sqlite3 libsqlite3-dev -y
-RUN apt-get install python3.6 -y
+RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y;
 RUN pip3 install virtualenv;
-RUN cd ~ && \
-  git clone https://github.com/raven-dark/sentinel.git && cd sentinel && mkdir database && \
-  virtualenv ./venv && \
-  ./venv/bin/pip install -r requirements.txt && \
-  echo "* * * * *    root    cd /root/sentinel && ./venv/bin/python bin/sentinel.py >> /var/log/sentinel.log 2>&1" >> /etc/crontab && \
-  sed -i -e '9iENVIR=docker\' /etc/crontab
+#RUN cd ~ && \
+ # git clone https://github.com/raven-dark/sentinel.git && cd sentinel && mkdir database && \
+  #virtualenv ./venv && \
+  #./venv/bin/pip install -r requirements.txt && \
+  #echo "* * * * *    root    cd /root/sentinel && ./venv/bin/python3 bin/sentinel.py >> /var/log/sentinel.log 2>&1" >> /etc/crontab && \
+  #sed -i -e '9iENVIR=docker\' /etc/crontab
+
+RUN mkdir /ravendark
 
 WORKDIR /ravendark
 

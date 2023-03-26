@@ -1,0 +1,7 @@
+version: "3"
+services:
+  ubuntu:
+    container_name: xrdmn
+    image: xrdmn
+    restart: on-failure
+    command: ["sleep","infinity"]
